@@ -1,0 +1,65 @@
+Source: sratom
+Section: libs
+Priority: optional
+Maintainer: Debian Multimedia Maintainers <debian-multimedia@lists.debian.org>
+Uploaders:
+ Alessio Treglia <alessio@debian.org>,
+ Jaromír Mikeš <mira.mikes@seznam.cz>,
+ Dennis Braun <d_braun@kabelmail.de>
+Build-Depends:
+ debhelper-compat (= 13),
+ libserd-dev (>= 0.30),
+ libsord-dev (>= 0.14),
+ lv2-dev (>= 1.16),
+ pkg-config,
+ python3:native,
+#Build-Depends-Indep:
+# doxygen,
+# graphviz
+Standards-Version: 4.5.1
+Homepage: https://drobilla.net/software/sratom/
+Vcs-Git: https://salsa.debian.org/multimedia-team/sratom.git
+Vcs-Browser: https://salsa.debian.org/multimedia-team/sratom
+Rules-Requires-Root: no
+
+Package: libsratom-dev
+Section: libdevel
+Architecture: any
+Multi-Arch: same
+Depends:
+ libserd-dev (>= 0.18.0~),
+ libsord-dev (>= 0.12.0~dfsg0),
+ libsratom-0-0 (= ${binary:Version}),
+ lv2-dev,
+ ${misc:Depends}
+Recommends:
+ pkg-config
+Suggests:
+ libsratom-doc
+Description: library for serialising LV2 atoms to/from Turtle - development files
+ Sratom is a new C library for serialising LV2 atoms to/from Turtle.
+ It is intended to be a full serialisation solution for LV2 atoms,
+ allowing implementations to serialise binary atoms to strings and
+ read them back again. This is particularly useful for saving plugin
+ state, or implementing plugin control with network transparency.
+ Sratom uses Serd and Sord to do the work, it is a small library
+ implemented in a single source file, suitable for direct inclusion
+ in projects if avoiding a dependency is desired.
+ .
+ This package provides the development files for Sratom.
+
+Package: libsratom-0-0
+Architecture: any
+Multi-Arch: same
+Depends:
+ ${misc:Depends},
+ ${shlibs:Depends}
+Description: library for serialising LV2 atoms to/from Turtle
+ Sratom is a new C library for serialising LV2 atoms to/from Turtle.
+ It is intended to be a full serialisation solution for LV2 atoms,
+ allowing implementations to serialise binary atoms to strings and
+ read them back again. This is particularly useful for saving plugin
+ state, or implementing plugin control with network transparency.
+ Sratom uses Serd and Sord to do the work, it is a small library
+ implemented in a single source file, suitable for direct inclusion
+ in projects if avoiding a dependency is desired.

@@ -1,0 +1,40 @@
+#!/usr/bin/make -f
+
+export DEB_BUILD_MAINT_OPTIONS = hardening=+bindnow
+
+include /usr/share/dpkg/architecture.mk
+include /usr/share/dpkg/buildtools.mk
+PKG_CONFIG ?= pkg-config
+WAF = python3 ./waf
+
+# the documentation can not be build atm, because of missing 'sphinx_lv2_theme'
+#ifeq ($(shell dpkg-query -s doxygen graphviz 1>/dev/null 2>&1 && echo yes),yes)
+#CONFIGURE_EXTRA_FLAGS += --docs
+#endif
+
+%:
+	dh $@
+
+override_dh_auto_configure:
+	CC=$(CC) PKGCONFIG=$(PKG_CONFIG) \
+	$(WAF) configure \
+		--prefix=/usr \
+		--mandir=/usr/share/man \
+		--libdir=/usr/lib/$(DEB_HOST_MULTIARCH) \
+		--strict \
+		$(CONFIGURE_EXTRA_FLAGS)
+
+override_dh_auto_build:
+	$(WAF)
+
+override_dh_auto_clean:
+	$(WAF) clean || true
+	find -name "*.pyc" -delete
+	rm -rf build .waf*
+	dh_auto_clean
+
+override_dh_auto_install:
+	$(WAF) install --destdir=$(CURDIR)/debian/tmp
+
+override_dh_installchangelogs:
+	dh_installchangelogs NEWS

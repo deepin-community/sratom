@@ -1,0 +1,134 @@
+sratom (0.6.8-1) unstable; urgency=medium
+
+  * New upstream version 0.6.8
+  * Disable doc build for now, missing sphinx_lv2_theme
+  * Bump S-V to 4.5.1, no changes needed
+  * Refresh patchset, drop obsolete reproducible-build patch
+  * Remove unnessecary LDFLAGS from d/rules
+  * Fix including buildtools.mk
+  * d/watch: Update pgpsigurlmangle for asc files
+
+ -- Dennis Braun <d_braun@kabelmail.de>  Thu, 14 Jan 2021 20:37:11 +0100
+
+sratom (0.6.6-1) unstable; urgency=medium
+
+  [ Debian Janitor ]
+  * Use secure URI in Homepage field.
+
+  [ Dennis Braun ]
+  * New upstream version 0.6.6
+  * Add d/upstream/signing-key.asc
+  * Add d/upstream/metadata
+  * Add Build-Depends-Package to symbols file
+  * Add me as uploader
+  * Bump dh-compat to 13
+  * Bump S-V to 4.5.0
+  * Update d/copyright year
+  * d/copyright: http > https
+  * Update ldconfig patch
+  * Make build reproducible. Thanks to Chris Lamb! (Closes: #966531)
+
+ -- Dennis Braun <d_braun@kabelmail.de>  Thu, 08 Oct 2020 15:15:07 +0200
+
+sratom (0.6.4-1) unstable; urgency=medium
+
+  [ Ondřej Nový ]
+  * Team upload.
+  * d/copyright: Use https protocol in Format field
+  * d/control: Set Vcs-* to salsa.debian.org
+
+  [ Felipe Sateler ]
+  * Change maintainer address to debian-multimedia@lists.debian.org
+
+  [ Ondřej Nový ]
+  * Use debhelper-compat instead of debian/compat
+
+  [ Helmut Grohne ]
+  * Fix FTCBFS: (Closes: #929088)
+    + Annotate Build-Depends: python with :native.
+    + Pass cross tools to waf.
+
+  [ Sebastian Ramacher ]
+  * New upstream release
+  * debian/:
+    - Use python3 to run waf (Closes: #943235)
+    - Bump debhelper compat to 12
+  * debian/rules: Remove get-orig-source
+  * debian/control:
+    - Bump Standards-Version
+    - Remove obsolete Pre-Depends
+    - Set RRR: no
+    - Bump build dependencies
+
+ -- Sebastian Ramacher <sramacher@debian.org>  Sun, 08 Dec 2019 21:41:55 +0100
+
+sratom (0.6.0~dfsg0-1) unstable; urgency=medium
+
+  * New upstream version 0.6.0~dfsg0
+  * Patch refreshed.
+  * Tighten B-D for libserd-dev.
+  * Bump Standards.
+  * Fix VCS fields.
+  * Update symbols file.
+  * Fix hardening.
+  * Update copyright file.
+  * Enable parallel build.
+
+ -- Jaromír Mikeš <mira.mikes@seznam.cz>  Fri, 23 Sep 2016 02:47:37 +0200
+
+sratom (0.4.6~dfsg0-1) unstable; urgency=medium
+
+  [ Jaromír Mikeš ]
+  * New upstream release.
+  * Tuned get-orig-source.
+  * Remove --debug from configure to cppflags be passed.
+
+  [ Alessio Treglia ]
+  * Add symbols control file.
+
+ -- Alessio Treglia <alessio@debian.org>  Wed, 20 Aug 2014 11:30:29 +0100
+
+sratom (0.4.4~dfsg0-1) unstable; urgency=low
+
+  [ Jaromír Mikeš ]
+  * Added myself as uploader
+
+  [ Alessio Treglia ]
+  * Imported Upstream version 0.4.4~dfsg0
+  * Bump Standards.
+  * Refresh patches.
+
+ -- Alessio Treglia <alessio@debian.org>  Mon, 06 Jan 2014 10:15:42 +0000
+
+sratom (0.4.2~dfsg0-2) unstable; urgency=low
+
+  * Upload to unstable.
+
+ -- Alessio Treglia <alessio@debian.org>  Wed, 08 May 2013 08:39:36 +0200
+
+sratom (0.4.2~dfsg0-1) experimental; urgency=low
+
+  * New upstream release.
+  * Needs sord >= 0.12.0.
+  * Tigthen build-dep on libserd-dev (>= 0.18.0~)
+  * Aill -dev's Depends field up properly by adding libsord-dev,
+    libserd-dev and lv2-dev.
+  * Fix libsratom-doc.install file.
+  * Bump Standards.
+
+ -- Alessio Treglia <alessio@debian.org>  Tue, 12 Mar 2013 17:18:50 +0000
+
+sratom (0.4.0~dfsg0-1) experimental; urgency=low
+
+  * New upstream release.
+  * Implement mechanism to automatically repack the upstream tarball.
+  * Install NEWS as upstream changelog.
+  * Refresh patches.
+
+ -- Alessio Treglia <alessio@debian.org>  Sun, 02 Sep 2012 18:17:28 +0200
+
+sratom (0.2.0~dfsg0-1) unstable; urgency=low
+
+  * Initial release. (Closes: #669343)
+
+ -- Alessio Treglia <alessio@debian.org>  Fri, 20 Apr 2012 10:47:31 +0200
