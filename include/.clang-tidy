@@ -1,7 +1,0 @@
-Checks: >
-  *,
-  -clang-diagnostic-unused-macros,
-  -llvmlibc-*,
-WarningsAsErrors: '*'
-HeaderFilterRegex: '.*'
-FormatStyle: file

@@ -1,3 +1,48 @@
+sratom (0.6.18-1) unstable; urgency=medium
+
+  * New upstream version 0.6.18
+  * Bump Standards-Version to 4.7.0
+  * Bump d/copyright years and add files licensed under 0BSD license
+  * pkg-config -> pkgconf
+  * Change my email address
+
+ -- Dennis Braun <snd@debian.org>  Sun, 09 Feb 2025 17:04:34 +0100
+
+sratom (0.6.16-1) unstable; urgency=medium
+
+  * New upstream version 0.6.16
+  * debian/rules: Remove left-overs from waf
+  * debian/control: Bump libsord-dev dependency
+
+ -- Sebastian Ramacher <sramacher@debian.org>  Sat, 11 Nov 2023 00:28:27 +0100
+
+sratom (0.6.14-1) unstable; urgency=medium
+
+  * New upstream version 0.6.14
+  * Build with meson
+  * Drop obsolete patch
+  * d/copyright: Update year and add myself to the d/ section
+  * d/copyright: Remove waf entry and BSD license
+  * d/watch: Check for .gz and .xz files too
+  * Remove obsolete d/clean
+  * Add salsa ci config
+
+ -- Dennis Braun <d_braun@kabelmail.de>  Tue, 13 Sep 2022 23:05:28 +0200
+
+sratom (0.6.10-1) unstable; urgency=medium
+
+  [ Debian Janitor ]
+  * Remove constraints unnecessary since buster
+
+  [ Dennis Braun ]
+  * New upstream version 0.6.10
+  * Refresh patchset
+  * Bump Standards Version to 4.6.1
+  * Comment out libsratom-dev suggests for now
+  * d/watch: Set pgpmode=auto
+
+ -- Dennis Braun <d_braun@kabelmail.de>  Tue, 31 May 2022 16:43:44 +0200
+
 sratom (0.6.8-1) unstable; urgency=medium
 
   * New upstream version 0.6.8

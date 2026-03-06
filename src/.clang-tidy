@@ -4,9 +4,15 @@
 Checks: >
   -*-macro-to-enum,
   -*-magic-numbers,
-  -bugprone-multi-level-implicit-pointer-conversion,
-  -bugprone-suspicious-realloc-usage,
+  -*-narrowing-conversions,
+  -bugprone-easily-swappable-parameters,
   -cert-err33-c,
+  -cert-err34-c,
+  -clang-analyzer-unix.Malloc,
+  -hicpp-signed-bitwise,
+  -misc-no-recursion,
   -performance-no-int-to-ptr,
+  -readability-function-cognitive-complexity,
   -readability-identifier-length,
+  -readability-redundant-casting,
 InheritParentConfig: true

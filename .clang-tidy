@@ -1,15 +1,17 @@
+# Copyright 2020-2024 David Robillard <d@drobilla.net>
+# SPDX-License-Identifier: 0BSD OR ISC
+
 Checks: >
   *,
-  -*-magic-numbers,
-  -*-uppercase-literal-suffix,
-  -bugprone-suspicious-string-compare,
-  -cert-err34-c,
-  -clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling,
-  -clang-analyzer-unix.Malloc,
-  -hicpp-signed-bitwise,
-  -llvm-header-guard,
+  -altera-*,
+  -clang-diagnostic-unused-macros,
   -llvmlibc-*,
-  -misc-no-recursion,
+  -misc-include-cleaner,
+CheckOptions:
+  - key:   hicpp-uppercase-literal-suffix.NewSuffixes
+    value: 'L;U;UL;ULL'
+  - key:   readability-uppercase-literal-suffix.NewSuffixes
+    value: 'L;U;UL;ULL'
 WarningsAsErrors: '*'
-HeaderFilterRegex: '.*'
+HeaderFilterRegex: '.*/sratom/[^/]+.h'
 FormatStyle: file

@@ -2,11 +2,12 @@
 # SPDX-License-Identifier: 0BSD OR ISC
 
 Checks: >
+  *,
   -*-macro-to-enum,
-  -*-magic-numbers,
-  -bugprone-multi-level-implicit-pointer-conversion,
-  -bugprone-suspicious-realloc-usage,
-  -cert-err33-c,
+  -altera-*,
+  -llvmlibc-*,
   -performance-no-int-to-ptr,
   -readability-identifier-length,
-InheritParentConfig: true
+WarningsAsErrors: '*'
+HeaderFilterRegex: '.*/sratom/[^/]+.h'
+FormatStyle: file
