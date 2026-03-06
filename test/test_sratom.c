@@ -1,26 +1,13 @@
-/*
-  Copyright 2012-2016 David Robillard <d@drobilla.net>
+// Copyright 2012-2016 David Robillard <d@drobilla.net>
+// SPDX-License-Identifier: ISC
 
-  Permission to use, copy, modify, and/or distribute this software for any
-  purpose with or without fee is hereby granted, provided that the above
-  copyright notice and this permission notice appear in all copies.
-
-  THIS SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-  WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-  MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-  ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-  WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-  ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-  OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-*/
-
-#include "lv2/atom/atom.h"
-#include "lv2/atom/forge.h"
-#include "lv2/atom/util.h"
-#include "lv2/midi/midi.h"
-#include "lv2/urid/urid.h"
-#include "serd/serd.h"
-#include "sratom/sratom.h"
+#include <lv2/atom/atom.h>
+#include <lv2/atom/forge.h>
+#include <lv2/atom/util.h>
+#include <lv2/midi/midi.h>
+#include <lv2/urid/urid.h>
+#include <serd/serd.h>
+#include <sratom/sratom.h>
 
 #include <stdarg.h>
 #include <stdbool.h>
@@ -82,11 +69,10 @@ urid_unmap(LV2_URID_Unmap_Handle handle, LV2_URID urid)
   return NULL;
 }
 
-SRATOM_LOG_FUNC(1, 2)
-static int
+SRATOM_LOG_FUNC(1, 2) static int
 test_fail(const char* fmt, ...)
 {
-  va_list args;
+  va_list args; // NOLINT(cppcoreguidelines-init-variables)
   va_start(args, fmt);
   fprintf(stderr, "error: ");
   vfprintf(stderr, fmt, args);
@@ -270,27 +256,27 @@ test(SerdEnv* env, bool top_level, bool pretty_numbers)
 
   // eg_ivector = (Vector<Int>)1,2,3,4,5
   lv2_atom_forge_key(&forge, eg_ivector);
-  int32_t ielems[] = {1, 2, 3, 4, 5};
+  const int32_t ielems[] = {1, 2, 3, 4, 5};
   lv2_atom_forge_vector(&forge, sizeof(int32_t), forge.Int, 5, ielems);
 
   // eg_lvector = (Vector<Long>)1,2,3,4
   lv2_atom_forge_key(&forge, eg_lvector);
-  int64_t lelems[] = {1, 2, 3, 4};
+  const int64_t lelems[] = {1, 2, 3, 4};
   lv2_atom_forge_vector(&forge, sizeof(int64_t), forge.Long, 4, lelems);
 
   // eg_fvector = (Vector<Float>)1.0,2.0,3.0,4.0,5.0
   lv2_atom_forge_key(&forge, eg_fvector);
-  float felems[] = {1, 2, 3, 4, 5};
+  const float felems[] = {1, 2, 3, 4, 5};
   lv2_atom_forge_vector(&forge, sizeof(float), forge.Float, 5, felems);
 
   // eg_dvector = (Vector<Double>)1.0,2.0,3.0,4.0
   lv2_atom_forge_key(&forge, eg_dvector);
-  double delems[] = {1, 2, 3, 4};
+  const double delems[] = {1, 2, 3, 4};
   lv2_atom_forge_vector(&forge, sizeof(double), forge.Double, 4, delems);
 
   // eg_bvector = (Vector<Bool>)1,0,1
   lv2_atom_forge_key(&forge, eg_bvector);
-  int32_t belems[] = {true, false, true};
+  const int32_t belems[] = {true, false, true};
   lv2_atom_forge_vector(&forge, sizeof(int32_t), forge.Bool, 3, belems);
 
   // eg_fseq = (Sequence)1, 2
@@ -338,8 +324,8 @@ test(SerdEnv* env, bool top_level, bool pretty_numbers)
   SerdNode s = serd_node_from_string(SERD_URI, USTR("http://example.org/obj"));
   SerdNode p = serd_node_from_string(SERD_URI, USTR(NS_RDF "value"));
 
-  SerdNode* subj = top_level ? NULL : &s;
-  SerdNode* pred = top_level ? NULL : &p;
+  const SerdNode* subj = top_level ? NULL : &s;
+  const SerdNode* pred = top_level ? NULL : &p;
 
   char* outstr = sratom_to_turtle(sratom,
                                   &unmap,
@@ -375,8 +361,8 @@ test(SerdEnv* env, bool top_level, bool pretty_numbers)
                                    LV2_ATOM_BODY(parsed));
     printf("# Turtle => Atom\n\n%s", instr);
 
-    if (strcmp(outstr, instr)) {
-      return test_fail("Re-serialised string differs from original\n");
+    if (!!strcmp(outstr, instr)) {
+      return test_fail("Re-serialized string differs from original\n");
     }
     free(instr);
   }

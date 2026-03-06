@@ -5,18 +5,19 @@ Maintainer: Debian Multimedia Maintainers <debian-multimedia@lists.debian.org>
 Uploaders:
  Alessio Treglia <alessio@debian.org>,
  Jaromír Mikeš <mira.mikes@seznam.cz>,
- Dennis Braun <d_braun@kabelmail.de>
+ Dennis Braun <snd@debian.org>
 Build-Depends:
  debhelper-compat (= 13),
  libserd-dev (>= 0.30),
- libsord-dev (>= 0.14),
+ libsord-dev (>= 0.16.16),
  lv2-dev (>= 1.16),
- pkg-config,
+ meson,
+ pkgconf,
  python3:native,
 #Build-Depends-Indep:
 # doxygen,
 # graphviz
-Standards-Version: 4.5.1
+Standards-Version: 4.7.0
 Homepage: https://drobilla.net/software/sratom/
 Vcs-Git: https://salsa.debian.org/multimedia-team/sratom.git
 Vcs-Browser: https://salsa.debian.org/multimedia-team/sratom
@@ -27,15 +28,15 @@ Section: libdevel
 Architecture: any
 Multi-Arch: same
 Depends:
- libserd-dev (>= 0.18.0~),
- libsord-dev (>= 0.12.0~dfsg0),
+ libserd-dev,
+ libsord-dev,
  libsratom-0-0 (= ${binary:Version}),
  lv2-dev,
  ${misc:Depends}
 Recommends:
- pkg-config
-Suggests:
- libsratom-doc
+ pkgconf
+#Suggests:
+# libsratom-doc
 Description: library for serialising LV2 atoms to/from Turtle - development files
  Sratom is a new C library for serialising LV2 atoms to/from Turtle.
  It is intended to be a full serialisation solution for LV2 atoms,

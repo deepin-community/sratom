@@ -1,26 +1,15 @@
-/*
-  Copyright 2012-2021 David Robillard <d@drobilla.net>
+// Copyright 2012-2024 David Robillard <d@drobilla.net>
+// SPDX-License-Identifier: ISC
 
-  Permission to use, copy, modify, and/or distribute this software for any
-  purpose with or without fee is hereby granted, provided that the above
-  copyright notice and this permission notice appear in all copies.
+#include <sratom/sratom.h>
 
-  THIS SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-  WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-  MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-  ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-  WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-  ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-  OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-*/
-
-#include "sratom/sratom.h"
-
-#include "lv2/atom/atom.h"
-#include "lv2/atom/forge.h"
-#include "lv2/atom/util.h"
-#include "lv2/midi/midi.h"
-#include "lv2/urid/urid.h"
+#include <lv2/atom/atom.h>
+#include <lv2/atom/forge.h>
+#include <lv2/atom/util.h>
+#include <lv2/midi/midi.h>
+#include <lv2/urid/urid.h>
+#include <serd/serd.h>
+#include <sord/sord.h>
 
 #include <assert.h>
 #include <ctype.h>
@@ -118,7 +107,7 @@ sratom_set_sink(Sratom*           sratom,
     serd_node_free(&sratom->base_uri);
     sratom->base_uri =
       serd_node_new_uri_from_string(USTR(base_uri), NULL, NULL);
-    serd_uri_parse(sratom->base_uri.buf, &sratom->base);
+    serd_uri_parse((const uint8_t*)sratom->base_uri.buf, &sratom->base);
   }
   sratom->write_statement = sink;
   sratom->end_anon        = end_sink;
@@ -140,7 +129,7 @@ sratom_set_object_mode(Sratom* sratom, SratomObjectMode object_mode)
 static void
 gensym(SerdNode* out, char c, unsigned num)
 {
-  out->n_bytes = out->n_chars = snprintf((char*)out->buf, 10, "%c%u", c, num);
+  out->n_bytes = out->n_chars = snprintf((char*)out->buf, 12, "%c%u", c, num);
 }
 
 static void
@@ -202,7 +191,7 @@ start_object(Sratom*         sratom,
     *flags |= SERD_ANON_CONT;
 
     // Object is in a list, stop list abbreviating if necessary
-    *flags &= ~SERD_LIST_CONT;
+    *flags &= ~(uint32_t)SERD_LIST_CONT;
   }
 
   if (type) {
@@ -248,10 +237,12 @@ sratom_write(Sratom*         sratom,
              uint32_t        size,
              const void*     body)
 {
+  static const char hex_chars[] = "0123456789ABCDEF";
+
   const char* const type        = unmap->unmap(unmap->handle, type_urid);
-  uint8_t           idbuf[12]   = "b0000000000";
+  const uint8_t     idbuf[12]   = "b0000000000";
   SerdNode          id          = serd_node_from_string(SERD_BLANK, idbuf);
-  uint8_t           nodebuf[12] = "b0000000000";
+  const uint8_t     nodebuf[12] = "b0000000000";
   SerdNode          node        = serd_node_from_string(SERD_BLANK, nodebuf);
   SerdNode          object      = SERD_NODE_NULL;
   SerdNode          datatype    = SERD_NODE_NULL;
@@ -295,7 +286,7 @@ sratom_write(Sratom*         sratom,
       object   = serd_node_new_file_uri(str, NULL, NULL, true);
     } else {
       if (!sratom->base_uri.buf ||
-          strncmp((const char*)sratom->base_uri.buf, "file://", 7)) {
+          !!strncmp((const char*)sratom->base_uri.buf, "file://", 7)) {
         fprintf(stderr, "warning: Relative path but base is not a file URI.\n");
         fprintf(stderr, "warning: Writing ambiguous atom:Path literal.\n");
         object   = serd_node_from_string(SERD_LITERAL, str);
@@ -334,13 +325,14 @@ sratom_write(Sratom*         sratom,
     new_node = true;
     datatype = serd_node_from_string(SERD_URI, USTR(LV2_MIDI__MidiEvent));
 
-    uint8_t* str = (uint8_t*)calloc(size * 2 + 1, 1);
-    for (uint32_t i = 0; i < size; ++i) {
-      snprintf((char*)str + (2 * i),
-               size * 2 + 1,
-               "%02X",
-               (unsigned)*((const uint8_t*)body + i));
+    const size_t len = (size_t)size * 2U;
+    char* const  str = (char*)calloc(len + 1, 1);
+    for (size_t i = 0U; i < size; ++i) {
+      const uint8_t byte = ((const uint8_t*)body)[i];
+      str[2U * i]        = hex_chars[byte >> 4U];
+      str[2U * i + 1U]   = hex_chars[byte & 0x0FU];
     }
+
     object = serd_node_from_string(SERD_LITERAL, USTR(str));
   } else if (type_urid == sratom->atom_Event) {
     const LV2_Atom_Event* ev = (const LV2_Atom_Event*)body;
@@ -461,7 +453,9 @@ sratom_write(Sratom*         sratom,
     start_object(sratom, &flags, subject, predicate, &id, type);
     SerdNode p = serd_node_from_string(SERD_URI, NS_RDF "value");
     flags |= SERD_LIST_O_BEGIN;
-    LV2_ATOM_SEQUENCE_BODY_FOREACH (seq, size, ev) {
+    for (const LV2_Atom_Event* ev = lv2_atom_sequence_begin(seq);
+         !lv2_atom_sequence_is_end(seq, size, ev);
+         ev = lv2_atom_sequence_next(ev)) {
       sratom->seq_unit = seq->unit;
       list_append(sratom,
                   unmap,
@@ -606,7 +600,7 @@ read_resource(Sratom*         sratom,
 }
 
 static uint32_t
-atom_size(Sratom* sratom, uint32_t type_urid)
+atom_size(const Sratom* sratom, uint32_t type_urid)
 {
   if (type_urid == sratom->forge.Int || type_urid == sratom->forge.Bool) {
     return sizeof(int32_t);
@@ -636,10 +630,10 @@ read_literal(Sratom* sratom, LV2_Atom_Forge* forge, const SordNode* node)
 {
   assert(sord_node_get_type(node) == SORD_LITERAL);
 
-  size_t      len      = 0;
-  const char* str      = (const char*)sord_node_get_string_counted(node, &len);
-  SordNode*   datatype = sord_node_get_datatype(node);
-  const char* language = sord_node_get_language(node);
+  size_t          len = 0;
+  const char*     str = (const char*)sord_node_get_string_counted(node, &len);
+  const SordNode* datatype = sord_node_get_datatype(node);
+  const char*     language = sord_node_get_language(node);
   if (datatype) {
     const char* type_uri = (const char*)sord_node_get_string(datatype);
     if (!strcmp(type_uri, (const char*)NS_XSD "int") ||
@@ -665,7 +659,7 @@ read_literal(Sratom* sratom, LV2_Atom_Forge* forge, const SordNode* node)
     } else if (!strcmp(type_uri, LV2_MIDI__MidiEvent)) {
       lv2_atom_forge_atom(forge, len / 2, sratom->midi_MidiEvent);
       for (const char* s = str; s < str + len; s += 2) {
-        unsigned num = 0u;
+        unsigned num = 0U;
         sscanf(s, "%2X", &num);
         const uint8_t c = num;
         lv2_atom_forge_raw(forge, &c, 1);
@@ -676,10 +670,15 @@ read_literal(Sratom* sratom, LV2_Atom_Forge* forge, const SordNode* node)
         forge, str, len, sratom->map->map(sratom->map->handle, type_uri), 0);
     }
   } else if (language) {
-    const char*  prefix   = "http://lexvo.org/id/iso639-3/";
-    const size_t lang_len = strlen(prefix) + strlen(language);
-    char*        lang_uri = (char*)calloc(lang_len + 1, 1);
-    snprintf(lang_uri, lang_len + 1, "%s%s", prefix, language);
+    static const char* const prefix       = "http://lexvo.org/id/iso639-3/";
+    const size_t             prefix_len   = strlen(prefix);
+    const size_t             language_len = strlen(language);
+    const size_t             lang_uri_len = prefix_len + language_len;
+    char*                    lang_uri     = (char*)calloc(lang_uri_len + 1, 1);
+
+    memcpy(lang_uri, prefix, prefix_len + 1);
+    memcpy(lang_uri + prefix_len, language, language_len + 1);
+
     lv2_atom_forge_literal(
       forge, str, len, 0, sratom->map->map(sratom->map->handle, lang_uri));
     free(lang_uri);
@@ -714,7 +713,7 @@ read_object(Sratom*         sratom,
   if (mode == MODE_SEQUENCE) {
     SordNode* time =
       sord_get(model, node, sratom->nodes.atom_beatTime, NULL, NULL);
-    uint32_t seq_unit = 0u;
+    uint32_t seq_unit = 0U;
     if (time) {
       const char* time_str = (const char*)sord_node_get_string(time);
       lv2_atom_forge_beat_time(forge, serd_strtod(time_str, NULL));
@@ -804,8 +803,10 @@ read_node(Sratom*         sratom,
       serd_uri_parse((const uint8_t*)str, &uri);
 
       SerdNode rel =
-        serd_node_new_relative_uri(&uri, &sratom->base, NULL, NULL);
-      uint8_t* path = serd_file_uri_parse(rel.buf, NULL);
+        serd_node_new_relative_uri(&uri, &sratom->base, &sratom->base, NULL);
+
+      uint8_t* const path = serd_file_uri_parse((const uint8_t*)rel.buf, NULL);
+
       if (path) {
         lv2_atom_forge_path(
           forge, (const char*)path, strlen((const char*)path));
@@ -850,7 +851,15 @@ sratom_read(Sratom*         sratom,
   sord_node_free(world, sratom->nodes.atom_frameTime);
   sord_node_free(world, sratom->nodes.atom_beatTime);
   sord_node_free(world, sratom->nodes.atom_childType);
-  memset(&sratom->nodes, 0, sizeof(sratom->nodes));
+
+  sratom->nodes.xsd_base64Binary = NULL;
+  sratom->nodes.rdf_value        = NULL;
+  sratom->nodes.rdf_type         = NULL;
+  sratom->nodes.rdf_rest         = NULL;
+  sratom->nodes.rdf_first        = NULL;
+  sratom->nodes.atom_beatTime    = NULL;
+  sratom->nodes.atom_frameTime   = NULL;
+  sratom->nodes.atom_childType   = NULL;
 }
 
 LV2_Atom_Forge_Ref
@@ -867,7 +876,7 @@ sratom_forge_sink(LV2_Atom_Forge_Sink_Handle handle,
 LV2_Atom*
 sratom_forge_deref(LV2_Atom_Forge_Sink_Handle handle, LV2_Atom_Forge_Ref ref)
 {
-  SerdChunk* chunk = (SerdChunk*)handle;
+  const SerdChunk* chunk = (const SerdChunk*)handle;
   return (LV2_Atom*)(chunk->buf + ref - 1);
 }
 
@@ -887,12 +896,12 @@ sratom_from_turtle(Sratom*         sratom,
   SerdReader* reader = sord_new_reader(model, env, SERD_TURTLE, NULL);
 
   if (!serd_reader_read_string(reader, (const uint8_t*)str)) {
-    SordNode* s = sord_node_from_serd_node(world, env, subject, 0, 0);
+    const SordNode* s = sord_node_from_serd_node(world, env, subject, 0, 0);
     lv2_atom_forge_set_sink(
       &sratom->forge, sratom_forge_sink, sratom_forge_deref, &out);
     if (subject && predicate) {
-      SordNode* p = sord_node_from_serd_node(world, env, predicate, 0, 0);
-      SordNode* o = sord_get(model, s, p, NULL, NULL);
+      const SordNode* p = sord_node_from_serd_node(world, env, predicate, 0, 0);
+      SordNode*       o = sord_get(model, s, p, NULL, NULL);
       if (o) {
         sratom_read(sratom, &sratom->forge, world, model, o);
         sord_node_free(world, o);
