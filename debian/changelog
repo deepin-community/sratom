@@ -1,3 +1,9 @@
+sratom (0.6.18-2) unstable; urgency=medium
+
+  * Rebuild with LTO enabled (dpkg vendor feature optimize/lto).
+
+ -- tunaichao <tunaichao@uniontech.com>  Thu, 10 Sep 2026 20:55:58 +0800
+
 sratom (0.6.18-1) unstable; urgency=medium
 
   * New upstream version 0.6.18
